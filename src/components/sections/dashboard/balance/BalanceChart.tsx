@@ -1,117 +1,66 @@
-import { useMemo } from 'react';
-import { SxProps, useTheme } from '@mui/material';
-import * as echarts from 'echarts/core';
-import ReactEchart from 'components/base/ReactEchart';
-import { CanvasRenderer } from 'echarts/renderers';
-import { LineChart } from 'echarts/charts';
+import { useEffect, useState } from 'react';
 
-import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-} from 'echarts/components';
+const API = "https://quickchart.io/chart";
 
-echarts.use([
-  LineChart,
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-  CanvasRenderer,
-]);
+const BalanceChart = () => {
+  const [chartUrl, setChartUrl] = useState<string | null>(null);
 
-interface ClientChartProps {
-  data: number[];
-  sx?: SxProps;
-}
-
-const BalanceChart = ({ data, ...rest }: ClientChartProps) => {
-  const theme = useTheme();
-
-  const option = useMemo(
-    () => ({
-      tooltip: {
-        trigger: 'axis',
-        formatter: '{b}: ${c}',
-      },
-      grid: {
-        top: 40,
-        bottom: 70,
-        left: 0,
-        right: 0,
-        containerLabel: true,
-      },
-      xAxis: {
-        type: 'category',
-        data: [
-          'Jul',
-          'Aug',
-          'Sep',
-          'Oct',
-          'Nov',
-          'Dec',
-          'Jan',
-          'Feb',
-          'Mar',
-          'Apr',
-          'May',
-          'Jun',
-          'Jul',
-          'Aug',
-          'Sep',
-        ],
-        axisTick: {
-          show: false,
-        },
-        axisLine: {
-          show: false,
-        },
-        axisLabel: {
-          show: false,
-        },
-        boundaryGap: 0,
-      },
-      yAxis: {
-        type: 'value',
-        min: 10,
-        minInterval: 1,
-        axisLabel: {
-          show: false,
-        },
-        splitLine: {
-          show: false,
-        },
-      },
-      series: [
-        {
-          data,
-          type: 'line',
-          smooth: true,
-          showSymbol: false,
-          symbol: 'none',
-          lineStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-              { offset: 0, color: 'rgba(84, 112, 198, 0.1)' },
-              { offset: 1, color: 'rgba(84, 112, 198, 1)' },
-            ]),
-            width: 3,
-            type: 'solid',
-            cap: 'round',
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        const chartConfig = {
+          type: 'bar', // Show a bar chart
+          data: {
+            labels: [2012, 2013, 2014, 2015, 2016], // Set X-axis labels
+            datasets: [
+              {
+                label: 'Users', // Create the 'Users' dataset
+                data: [120, 60, 50, 180, 120], // Add data to the chart
+                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Optional styling
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+              },
+            ],
           },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(84, 112, 198, 0.5)' },
-              { offset: 1, color: 'rgba(84, 112, 198, 0)' },
-            ]),
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              },
+            },
           },
-        },
-      ],
-    }),
-    [theme, data],
+        };
+
+        const response = await fetch(`${API}?chart=${encodeURIComponent(JSON.stringify(chartConfig))}&width=500&height=300&format=png`, {
+          method: 'GET', // Use GET for query parameters
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const imageUrl = response.url; // The URL of the generated chart
+        setChartUrl(imageUrl);
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+      }
+    };
+
+    fetchChartData();
+  }, []);
+
+  return (
+    <div>
+      <h1>Chart</h1>
+      {chartUrl ? (
+        <img src={chartUrl} alt="Chart" /> // Display the chart
+      ) : (
+        <p>Loading chart...</p> // Show a loading message while fetching
+      )}
+    </div>
   );
-
-  return <ReactEchart echarts={echarts} option={option} {...rest} />;
 };
 
 export default BalanceChart;
+

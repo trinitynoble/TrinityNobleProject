@@ -111,10 +111,7 @@ const Balance = () => {
         ))}
       </Stack>
 
-      <BalanceChart
-        data={[20, 30, 50, 45, 60, 20, 40, 50, 30, 60, 40, 50, 20, 45, 30]}
-        sx={{ width: 1, height: '220px !important' }}
-      />
+      <BalanceChart></BalanceChart>
     </Paper>
   );
 };
