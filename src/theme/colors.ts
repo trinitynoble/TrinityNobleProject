@@ -7,13 +7,15 @@ export const red = {
 };
 
 export const green = {
-  500: '#05CD99',
+  500: '#72b718',
+  600: '#0c3319',
+  300: '#b1d8b7'
 };
 
 export const blue = {
-  300: '#707EAE',
-  400: '#2B3674',
-  500: '#1B2559',
+  300: '#5ba3f8',
+  400: '#365070',
+  500: '#144582',
 };
 
 export const skyblue = {
@@ -26,7 +28,7 @@ export const purple = {
 };
 
 export const yellow = {
-  500: '#FFB547',
+  500: '#ffed00',
 };
 
 export const white = {

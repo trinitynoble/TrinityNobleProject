@@ -4,8 +4,6 @@ import {
   red,
   green,
   blue,
-  skyblue,
-  purple,
   yellow,
   white,
   transparentRed,
@@ -14,6 +12,9 @@ import {
 } from './colors';
 
 declare module '@mui/material/styles' {
+  interface TypeText {
+    buttons?: string;
+  }
   interface PaletteOptions {
     neutral?: PaletteColorOptions;
     transparent?: {
@@ -53,10 +54,10 @@ const palette: PaletteOptions = {
     main: gray[500],
   },
   primary: {
-    main: purple[500],
+    main: green[500],
   },
   secondary: {
-    light: skyblue[500],
+    light: yellow[500],
     main: blue[500],
   },
   info: {
@@ -76,12 +77,13 @@ const palette: PaletteOptions = {
   text: {
     primary: blue[500],
     secondary: blue[400],
+    buttons: white[100],
     disabled: gray[500],
   },
   gradients: {
     primary: {
-      main: purple[500],
-      state: purple[300],
+      main: green[300],
+      state: blue[300],
     },
   },
   transparent: {

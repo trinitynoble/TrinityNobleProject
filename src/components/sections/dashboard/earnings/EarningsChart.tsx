@@ -21,30 +21,26 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-interface ClientChartProps {
+interface ActivityChartProps {
   data: number[];
   sx?: SxProps;
 }
 
-const EarningsChart = ({ data, ...rest }: ClientChartProps) => {
+const EarningsChart = ({ data, ...rest }: ActivityChartProps) => {
   const theme = useTheme();
 
   const option = useMemo(
     () => ({
-      tooltip: {
-        trigger: 'axis',
-        formatter: 'Earnings: ${c}',
-      },
       grid: {
-        top: 40,
-        bottom: 70,
-        left: 0,
-        right: 0,
+        top: 10,
+        bottom: 10,
+        left: 5,
+        right: 5,
         containerLabel: true,
       },
       xAxis: {
         type: 'category',
-        data: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        data: ['', '', '', '', ''],
         axisTick: {
           show: false,
         },
@@ -70,18 +66,14 @@ const EarningsChart = ({ data, ...rest }: ClientChartProps) => {
           type: 'line',
           smooth: true,
           showSymbol: false,
-          symbol: 'none',
           lineStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              { offset: 1, color: 'rgba(84, 112, 198, 0.2)' },
+              { offset: 0, color: theme.palette.info.light },
+            ]),
             width: 3,
             type: 'solid',
             cap: 'round',
-            color: theme.palette.primary.main,
-          },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(84, 112, 198, 0.5)' },
-              { offset: 1, color: 'rgba(84, 112, 198, 0)' },
-            ]),
           },
         },
       ],

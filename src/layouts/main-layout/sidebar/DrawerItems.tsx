@@ -1,16 +1,14 @@
-import { fontFamily } from 'theme/typography';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import ButtonBase from '@mui/material/ButtonBase';
-import Typography from '@mui/material/Typography';
 import ListItem from './list-items/ListItem';
 import CollapseListItem from './list-items/CollapseListItem';
 import Image from 'components/base/Image';
 import IconifyIcon from 'components/base/IconifyIcon';
-import LogoImg from 'assets/images/logo.png';
+import LogoRectImg from 'assets/images/logorect.png';
 import sitemap from 'routes/sitemap';
 
 const DrawerItems = () => {
@@ -30,29 +28,8 @@ const DrawerItems = () => {
         zIndex={1000}
       >
         <ButtonBase component={Link} href="/" disableRipple>
-          <Image src={LogoImg} alt="logo" height={52} width={52} sx={{ mr: 1.75 }} />
-          <Box>
-            <Typography
-              mt={0.25}
-              variant="h3"
-              color="primary.main"
-              textTransform="uppercase"
-              letterSpacing={1}
-              fontFamily={fontFamily.poppins}
-            >
-              budgetbuddy
-            </Typography>
-            <Typography
-              mt={-0.35}
-              variant="body2"
-              color="primary.main"
-              textTransform="uppercase"
-              fontWeight={500}
-              fontFamily={fontFamily.poppins}
-            >
-              Dashboard
-            </Typography>
-          </Box>
+          <Image src={LogoRectImg} alt="logo" height={75} width={210} sx={{ mr: 1.75 }} />
+
         </ButtonBase>
       </Stack>
 
