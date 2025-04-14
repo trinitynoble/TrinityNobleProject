@@ -1,6 +1,6 @@
 import { useState, PropsWithChildren } from 'react';
 import Stack from '@mui/material/Stack';
-import Sidebar from 'layouts/main-layout/sidebar';
+import Sidebar from './sidebar';
 import Topbar from 'layouts/main-layout/topbar';
 import Footer from './footer';
 
