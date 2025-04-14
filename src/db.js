@@ -20,9 +20,11 @@ const db = new sqlite3.Database('./db/database.db', sqlite3.OPEN_READWRITE, (err
 });
 
 // Wrap db.run in a Promise for async/await support
+const originalDbRun = db.run; // Store the original db.run function
+
 db.run = function (sql, params = []) {
   return new Promise((resolve, reject) => {
-    this.run(sql, params, function (err) {
+    originalDbRun.call(this, sql, params, function (err) { // Call the original db.run
       if (err) {
         console.error('Error executing query:', err.message);
         reject(err);

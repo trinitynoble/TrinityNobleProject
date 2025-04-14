@@ -1,19 +1,16 @@
 import express from 'express';
-import db from '../../db.js'; // Import the database connection
+import db from '../../db.js';
 
 const router = express.Router();
 
-// POST /budgetbuddy/api/transactions - Add a new transaction
 router.post('/', async (req, res) => {
   const { amount, description, date, userId } = req.body;
-
-  // Validate the request body
   if (!amount || !description || !date || !userId) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
   const query = `
-    INSERT INTO Transactions (amount, description, date, userId)
+    INSERT INTO Transactions (amount, description, date, User_id)
     VALUES (?, ?, ?, ?)
   `;
 
@@ -26,7 +23,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /budgetbuddy/api/transactions - Retrieve all transactions
 router.get('/', async (req, res) => {
   const query = 'SELECT * FROM Transactions';
 

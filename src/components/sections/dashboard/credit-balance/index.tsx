@@ -57,7 +57,7 @@ const CreditBalance = () => {
     amount: '',
     description: '',
     date: '',
-    userId: 1,
+    User_id: 1,
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,22 +72,38 @@ const CreditBalance = () => {
     const payload = {
       ...formData,
       amount: parseFloat(formData.amount),
-      userId: formData.userId,
+      userId: formData.User_id,
     };
 
     try {
-      const response = await fetch('http://localhost:3000/budgetbuddy/api/transactions', { // Add /budgetbuddy prefix
+      const response = await fetch('/api/transactions', { // Add /budgetbuddy prefix
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),      
+        body: JSON.stringify(payload),
       });
 
-      const responseData = await response.json(); // Parse the response
+      let responseData;
+      try {
+        // Check if the response is JSON
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('application/json')) {
+          responseData = await response.json(); // Parse the response
+        } else {
+          console.error('Invalid Content-Type:', contentType);
+          throw new Error('Response is not JSON');
+        }
+      } catch (parseError) {
+        console.error('Error parsing JSON:', parseError);
+        console.error('Full Response:', response);
+        alert('An error occurred while processing the server response.');
+        return;
+      }
+
       console.log('API Response:', responseData); // Log the response for debugging
 
       if (response.ok) {
         alert('Transaction added successfully!');
-        setFormData({ amount: '', description: '', date: '', userId: 1 });
+        setFormData({ amount: '', description: '', date: '', User_id: 1 });
         handleClose();
       } else {
         console.error('Error response:', responseData);
@@ -95,9 +111,9 @@ const CreditBalance = () => {
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error('Error:', error.message); // Log the error
+        console.error('Error:', error.message);
       } else {
-        console.error('Error:', error); // Log the error if it's not an instance of Error
+        console.error('Error:', error);
       }
       alert('An error occurred while submitting the transaction.');
     }
