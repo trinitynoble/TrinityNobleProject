@@ -1,7 +1,10 @@
 import express from 'express';
 import db from '../../db.js'; // Adjust the path if needed
+import bcrypt from 'bcrypt'; // Import bcrypt
 
 const router = express.Router();
+
+const saltRounds = 10; // Define the number of salt rounds
 
 // POST /budgetbuddy/api/users - Register a new user
 router.post('/', async (req, res) => {
@@ -11,13 +14,16 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'All fields are required.' });
   }
 
-  const query = `
-    INSERT INTO Users (user_firstName, user_lastName, user_email, user_password)
-    VALUES (?, ?, ?, ?)
-  `;
-
   try {
-    const result = await db.run(query, [User_FirstName, User_LastName, User_Email, User_password]);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(User_password, saltRounds);
+
+    const query = `
+      INSERT INTO Users (user_firstName, user_lastName, user_email, user_password)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    const result = await db.run(query, [User_FirstName, User_LastName, User_Email, hashedPassword]);
     res.status(201).json({ message: 'Signed up successfully!', id: result.lastID });
   } catch (err) {
     console.error('Database Error:', err.message);
