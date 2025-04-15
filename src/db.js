@@ -19,6 +19,7 @@ const db = new sqlite3.Database('./db/database.db', sqlite3.OPEN_READWRITE, (err
   }
 });
 
+
 // Wrap db.run in a Promise for async/await support
 db.run = function (sql, params = []) {
   return new Promise((resolve, reject) => {

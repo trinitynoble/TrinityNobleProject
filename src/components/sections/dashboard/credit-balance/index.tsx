@@ -57,7 +57,7 @@ const CreditBalance = () => {
     amount: '',
     description: '',
     date: '',
-    userId: 1,
+    User_id: 1,
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,7 +72,7 @@ const CreditBalance = () => {
     const payload = {
       ...formData,
       amount: parseFloat(formData.amount),
-      userId: formData.userId,
+      User_id: formData.User_id,
     };
 
     try {
@@ -87,7 +87,7 @@ const CreditBalance = () => {
 
       if (response.ok) {
         alert('Transaction added successfully!');
-        setFormData({ amount: '', description: '', date: '', userId: 1 });
+        setFormData({ amount: '', description: '', date: '', User_id: 1 });
         handleClose();
       } else {
         console.error('Error response:', responseData);

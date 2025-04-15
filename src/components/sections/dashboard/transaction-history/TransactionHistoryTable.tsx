@@ -1,145 +1,122 @@
-import { useEffect } from 'react';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import { DataGrid, GridColDef, useGridApiRef, GridApi } from '@mui/x-data-grid';
-import DataGridFooter from 'components/common/DataGridFooter';
-import { rows } from 'data/transactionHistory';
-import { Typography } from '@mui/material';
-import ActionMenu from './ActionMenu';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import {
+  DataGrid,
+  GridColDef,
+  useGridApiRef,
+  GridRowModesModel,
+  GridRowModes,
+  GridActionsCellItem,
+  GridRowEditStopReasons
+} from '@mui/x-data-grid';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Close';
 
-const columns: GridColDef<(typeof rows)[number]>[] = [
-  {
-    field: 'id',
-    headerName: 'Transaction Id',
-    editable: false,
-    align: 'left',
-    flex: 2,
-    minWidth: 160,
-    renderHeader: () => (
-      <Typography variant="body2" fontWeight={600} ml={1}>
-        Transaction Id
-      </Typography>
-    ),
-    renderCell: (params) => (
-      <Stack ml={1} height={1} direction="column" alignSelf="center" justifyContent="center">
-        <Typography variant="body2" fontWeight={500}>
-          {params.value}
-        </Typography>
-      </Stack>
-    ),
-  },
-  {
-    field: 'category',
-    headerName: 'Category',
-    editable: false,
-    align: 'left',
-    flex: 2,
-    minWidth: 140,
-  },
-  {
-    field: 'date',
-    headerName: 'Date',
-    editable: false,
-    align: 'left',
-    flex: 2,
-    minWidth: 160,
-  },
-  {
-    field: 'amount',
-    headerName: 'Amount',
-    editable: false,
-    align: 'left',
-    flex: 2,
-    minWidth: 120,
-  },
-  {
-    field: 'paymentMethod',
-    headerName: 'Payment Method',
-    editable: false,
-    align: 'left',
-    flex: 2,
-    minWidth: 150,
-  },
-  {
-    field: 'status',
-    headerName: 'Status',
-    headerAlign: 'center',
-    editable: false,
-    flex: 1,
-    minWidth: 140,
-    renderCell: (params) => {
-      const color =
-        params.value === 'Pending'
-          ? 'warning'
-          : params.value === 'Completed'
-            ? 'success'
-            : params.value === 'Failed'
-              ? 'error'
-              : 'info';
-      return (
-        <Stack direction="column" alignItems="center" justifyContent="center" height={1}>
-          <Chip label={params.value} size="small" color={color} />
-        </Stack>
-      );
-    },
-  },
-  {
-    field: 'balance',
-    headerName: 'Balance',
-    headerAlign: 'right',
-    align: 'right',
-    editable: false,
-    flex: 1,
-    minWidth: 100,
-  },
-  {
-    field: 'action',
-    headerAlign: 'right',
-    align: 'right',
-    editable: false,
-    sortable: false,
-    flex: 1,
-    minWidth: 100,
-    renderHeader: () => <ActionMenu />,
-    renderCell: () => <ActionMenu />,
-  },
-];
+interface Transaction {
+  Transaction_id: number;
+  amount: number;
+  description: string;
+  date: string;
+  User_id: number;
+  id: number; // Required for DataGrid
+}
 
-interface TaskOverviewTableProps {
+interface Props {
   searchText: string;
 }
 
-const TransactionHistoryTable = ({ searchText }: TaskOverviewTableProps) => {
-  const apiRef = useGridApiRef<GridApi>();
+const TransactionHistoryTable = ({ searchText }: Props) => {
+  const apiRef = useGridApiRef();
+  const [rows, setRows] = useState<Transaction[]>([]);
+  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+
+  const fetchTransactions = async () => {
+    const res = await axios.get('http://localhost:3000/budgetbuddy/api/transactions');
+    const dataWithId = res.data.map((tx: Transaction) => ({ ...tx, id: tx.Transaction_id }));
+    setRows(dataWithId);
+  };
 
   useEffect(() => {
-    apiRef.current.setQuickFilterValues(searchText.split(/\b\W+\b/).filter((word) => word !== ''));
+    fetchTransactions();
+  }, []);
+
+  useEffect(() => {
+    apiRef.current?.setQuickFilterValues(searchText.split(/\b\W+\b/).filter(Boolean));
   }, [searchText]);
+
+  const handleEditClick = (id: number) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
+
+  const handleSaveClick = (id: number) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  };
+
+  const handleCancelClick = (id: number) => () => {
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.View, ignoreModifications: true }
+    });
+  };
+
+  const handleDeleteClick = (id: number) => async () => {
+    await axios.delete(`http://localhost:3000/budgetbuddy/api/transactions/${id}`);
+    setRows(rows.filter((r) => r.id !== id));
+  };
+
+  const processRowUpdate = async (newRow: Transaction) => {
+    await axios.put(`http://localhost:3000/budgetbuddy/api/transactions/${newRow.Transaction_id}`, {
+      amount: newRow.amount,
+      description: newRow.description,
+      date: newRow.date
+    });
+    return newRow;
+  };
+
+  const columns: GridColDef[] = [
+    { field: 'Transaction_id', headerName: 'Transaction ID', width: 120, editable: false },
+    { field: 'description', headerName: 'Description', flex: 2, editable: true },
+    { field: 'amount', headerName: 'Amount', type: 'number', flex: 1, editable: true },
+    { field: 'date', headerName: 'Date', flex: 1.5, editable: true },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Actions',
+      width: 100,
+      getActions: ({ id }) => {
+        const isEditing = rowModesModel[id]?.mode === GridRowModes.Edit;
+        return isEditing
+          ? [
+              <GridActionsCellItem icon={<SaveIcon />} label="Save" onClick={handleSaveClick(Number(id))} />,
+              <GridActionsCellItem icon={<CancelIcon />} label="Cancel" onClick={handleCancelClick(Number(id))} />
+            ]
+          : [
+              <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={handleEditClick(Number(id))} />,
+              <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={handleDeleteClick(Number(id))} />
+            ];
+      }
+    }
+  ];
 
   return (
     <DataGrid
       apiRef={apiRef}
-      density="standard"
-      columns={columns}
       rows={rows}
-      rowHeight={52}
-      disableColumnResize
-      disableColumnMenu
-      disableColumnSelector
-      disableRowSelectionOnClick
-      initialState={{
-        pagination: { paginationModel: { pageSize: 4 } },
-      }}
-      autosizeOptions={{
-        includeOutliers: true,
-        includeHeaders: false,
-        outliersFactor: 1,
-        expand: true,
-      }}
-      slots={{
-        pagination: DataGridFooter,
-      }}
+      columns={columns}
+      autoHeight
       checkboxSelection
+      disableRowSelectionOnClick
+      rowModesModel={rowModesModel}
+      onRowEditStop={(params, event) => {
+        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+          event.defaultMuiPrevented = true;
+        }
+      }}
+      processRowUpdate={processRowUpdate}
+      experimentalFeatures={{}}
+      paginationModel={{ pageSize: 5, page: 0 }}
       pageSizeOptions={[5]}
     />
   );

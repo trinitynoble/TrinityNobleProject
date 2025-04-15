@@ -14,7 +14,7 @@ const Clients = () => {
     amount: '',
     description: '',
     date: '',
-    userId: 1,
+    User_id: 1,
   });
 
   const handleOpen = () => setOpen(true);
@@ -46,7 +46,7 @@ const Clients = () => {
 
       if (response.ok) {
         alert('Expense added successfully!');
-        setFormData({ amount: '', description: '', date: '', userId: 1 });
+        setFormData({ amount: '', description: '', date: '', User_id: 1 });
         handleClose();
       } else {
         const errorData = await response.json();
