@@ -13,11 +13,12 @@ import IconifyIcon from 'components/base/IconifyIcon';
 import paths from 'routes/paths';
 
 interface User {
-  [key: string]: string;
+  User_Email: string;
+  User_password: string;
 }
 
 const Signin = () => {
-  const [user, setUser] = useState<User>({ email: '', password: '' });
+  const [user, setUser] = useState<User>({ User_Email: '', User_password: '' });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,14 +34,14 @@ const Signin = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),
       });
+      
 
       const data = await response.json();
 
       if (response.ok) {
-        // Sign-in successful
         alert(data.message);
-        // Redirect or store user info as needed
         console.log('User ID:', data.userId); // Log the user ID
+        window.location.href = '/dashboard'; // Redirect to the dashboard
       } else {
         // Sign-in failed
         alert(data.error);
@@ -64,10 +65,10 @@ const Signin = () => {
 
       <Stack component="form" mt={3} onSubmit={handleSubmit} direction="column" gap={2}>
         <TextField
-          id="email"
-          name="email"
+          id="User_Email"
+          name="User_Email"
           type="email"
-          value={user.email}
+          value={user.User_Email}
           onChange={handleInputChange}
           variant="filled"
           placeholder="Your Email"
@@ -84,10 +85,10 @@ const Signin = () => {
           }}
         />
         <TextField
-          id="password"
-          name="password"
+          id="User_password"
+          name="User_password"
           type={showPassword ? 'text' : 'password'}
-          value={user.password}
+          value={user.User_password}
           onChange={handleInputChange}
           variant="filled"
           placeholder="Your Password"
@@ -104,8 +105,8 @@ const Signin = () => {
               <InputAdornment
                 position="end"
                 sx={{
-                  opacity: user.password ? 1 : 0,
-                  pointerEvents: user.password ? 'auto' : 'none',
+                  opacity: user.User_password ? 1 : 0,
+                  pointerEvents: user.User_password ? 'auto' : 'none',
                 }}
               >
                 <IconButton

@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import transactionsRouter from './pages/api/transactions.js';
-import usersRouter from './pages/api/users.js';
+import userRouter from './routes/users.js'; 
 import db from './db.js';
 
 const app = express();
@@ -13,29 +13,28 @@ const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 
-// Serve static frontend
 const frontendPath = path.join(__dirname, './dist');
 app.use(express.static(frontendPath));
-app.use('/budgetbuddy/api/transactions', transactionsRouter);
-app.use('/budgetbuddy/api/users', usersRouter);
 
-// Transactions DELETE
-app.use('/budgetbuddy', express.static(path.join(__dirname, 'dist')));
-app.delete('/api/transactions/:id', async (req, res) => {
-  const { id } = req.params; // Capture the transaction ID from the URL parameter
+app.use('/budgetbuddy/api/transactions', transactionsRouter);
+app.use('/budgetbuddy/api/users', userRouter);
+
+app.delete('/budgetbuddy/api/transactions/:id', async (req, res) => {
+  const { id } = req.params;
   const query = 'DELETE FROM Transactions WHERE Transaction_id = ?';
 
   try {
-    await db.run(query, [id]); // Delete the transaction from the database
+    await db.run(query, [id]);
     res.status(200).json({ message: 'Transaction deleted successfully.' });
   } catch (err) {
     console.error('Database error:', err.message);
     res.status(500).json({ error: 'Failed to delete transaction.' });
   }
 });
-app.put('/api/transactions/:id', async (req, res) => {
-  const { id } = req.params; // Capture the transaction ID from the URL parameter
-  const { amount, description, date } = req.body; // Get the updated values from the request body
+
+app.put('/budgetbuddy/api/transactions/:id', async (req, res) => {
+  const { id } = req.params;
+  const { amount, description, date } = req.body;
 
   const query = `
     UPDATE Transactions
@@ -44,7 +43,7 @@ app.put('/api/transactions/:id', async (req, res) => {
   `;
 
   try {
-    await db.run(query, [amount, description, date, id]); // Update the transaction in the database
+    await db.run(query, [amount, description, date, id]);
     res.status(200).json({ message: 'Transaction updated successfully.' });
   } catch (err) {
     console.error('Database error:', err.message);
@@ -52,11 +51,10 @@ app.put('/api/transactions/:id', async (req, res) => {
   }
 });
 
-// Catch-all to serve frontend (for React Router SPA)
 app.get('', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}`);
 });
