@@ -24,9 +24,31 @@ const Signin = () => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(user);
+
+    try {
+      const response = await fetch('http://localhost:3000/budgetbuddy/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Sign-in successful
+        alert(data.message);
+        // Redirect or store user info as needed
+        console.log('User ID:', data.userId); // Log the user ID
+      } else {
+        // Sign-in failed
+        alert(data.error);
+      }
+    } catch (error) {
+      console.error('There was an error during sign-in:', error);
+      alert('Failed to sign in. Please try again.');
+    }
   };
 
   return (
@@ -35,31 +57,10 @@ const Signin = () => {
         Sign In
       </Typography>
       <Typography mt={1.5} align="center" variant="body2">
-        Welcome back! Let's continue with,
+        Welcome back!
       </Typography>
 
-      <Stack mt={3} spacing={1.75} width={1}>
-        <Button
-          variant="contained"
-          color="secondary"
-          fullWidth
-          startIcon={<IconifyIcon icon="logos:google-icon" />}
-          sx={{ bgcolor: 'info.main', '&:hover': { bgcolor: 'info.main' } }}
-        >
-          Google
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          fullWidth
-          startIcon={<IconifyIcon icon="logos:apple" sx={{ mb: 0.5 }} />}
-          sx={{ bgcolor: 'info.main', '&:hover': { bgcolor: 'info.main' } }}
-        >
-          Apple
-        </Button>
-      </Stack>
-
-      <Divider sx={{ my: 4 }}>or Signin with</Divider>
+      <Divider sx={{ my: 4 }}>Please Sign In!</Divider>
 
       <Stack component="form" mt={3} onSubmit={handleSubmit} direction="column" gap={2}>
         <TextField
