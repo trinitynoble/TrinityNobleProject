@@ -22,5 +22,5 @@ export default defineConfig({
   preview: {
     port: 5000,
   },
-  base: '/', // Revert to default base path
+  base: '/budgetbuddy/', // Revert to default base path
 });

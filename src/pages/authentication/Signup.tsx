@@ -11,20 +11,60 @@ import IconifyIcon from 'components/base/IconifyIcon';
 import paths from 'routes/paths';
 
 interface User {
-  [key: string]: string;
+  user_firstName: string;
+  user_lastName: string;
+  user_email: string;
+  user_password: string;
 }
 
 const Signup = () => {
-  const [user, setUser] = useState<User>({ name: '', email: '', password: '' });
+  const [user, setUser] = useState<User>({
+    user_firstName: '',
+    user_lastName: '',
+    user_email: '',
+    user_password: '',
+  });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setUser(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log(user);
+    const { user_firstName, user_lastName, user_email, user_password } = user;
+
+    if (!user_firstName || !user_lastName || !user_email || !user_password) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/budgetbuddy/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('User registered successfully!');
+        setUser({
+          user_firstName: '',
+          user_lastName: '',
+          user_email: '',
+          user_password: '',
+        });
+      } else {
+        console.error('Error response:', data);
+        alert(data.error || 'Failed to register user.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while registering the user.');
+    }
   };
 
   return (
@@ -61,16 +101,14 @@ const Signup = () => {
 
       <Stack component="form" mt={3} onSubmit={handleSubmit} direction="column" gap={2}>
         <TextField
-          id="name"
-          name="name"
+          name="user_firstName"
           type="text"
-          value={user.name}
+          value={user.user_firstName}
           onChange={handleInputChange}
           variant="filled"
-          placeholder="Your Name"
-          autoComplete="name"
+          placeholder="First Name"
+          autoComplete="given-name"
           fullWidth
-          autoFocus
           required
           InputProps={{
             startAdornment: (
@@ -81,10 +119,27 @@ const Signup = () => {
           }}
         />
         <TextField
-          id="email"
-          name="email"
+          name="user_lastName"
+          type="text"
+          value={user.user_lastName}
+          onChange={handleInputChange}
+          variant="filled"
+          placeholder="Last Name"
+          autoComplete="family-name"
+          fullWidth
+          required
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <IconifyIcon icon="ic:outline-account-circle" />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <TextField
+          name="user_email"
           type="email"
-          value={user.email}
+          value={user.user_email}
           onChange={handleInputChange}
           variant="filled"
           placeholder="Your Email"
@@ -100,14 +155,13 @@ const Signup = () => {
           }}
         />
         <TextField
-          id="password"
-          name="password"
+          name="user_password"
           type={showPassword ? 'text' : 'password'}
-          value={user.password}
+          value={user.user_password}
           onChange={handleInputChange}
           variant="filled"
           placeholder="Your Password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           fullWidth
           required
           InputProps={{
@@ -120,8 +174,8 @@ const Signup = () => {
               <InputAdornment
                 position="end"
                 sx={{
-                  opacity: user.password ? 1 : 0,
-                  pointerEvents: user.password ? 'auto' : 'none',
+                  opacity: user.user_password ? 1 : 0,
+                  pointerEvents: user.user_password ? 'auto' : 'none',
                 }}
               >
                 <IconButton

@@ -1,5 +1,5 @@
 export const rootPaths = {
-  root: '/',
+  root: '/budgetbuddy/',
   pageRoot: 'pages',
   authRoot: 'auth',
   errorRoot: 'error',

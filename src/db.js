@@ -23,7 +23,7 @@ const db = new sqlite3.Database('./db/database.db', sqlite3.OPEN_READWRITE, (err
 // Wrap db.run in a Promise for async/await support
 db.run = function (sql, params = []) {
   return new Promise((resolve, reject) => {
-    this.run(sql, params, function (err) {
+    sqlite3.Database.prototype.run.call(this, sql, params, function (err) {
       if (err) {
         console.error('Error executing query:', err.message);
         reject(err);
